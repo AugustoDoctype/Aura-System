@@ -1,5 +1,5 @@
 /* ==========================================
-   RESET GERAL
+   RESET & FUNDO (Oceano Noturno)
    ========================================== */
 * {
   box-sizing: border-box;
@@ -8,146 +8,233 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #111827; /* Fundo cinza chumbo (Slate 900) */
-  color: #e5e7eb;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #0d0f18; 
+  
+  /* A mágica da Malha Diagonal e Vinheta */
+  background-image: 
+    /* 1. Vinheta: Mantém as bordas mais escuras */
+    radial-gradient(circle at center, transparent 10%, #0d0f18 100%),
+    /* 2. Diagonal principal ( / ) - Preto e com 2px de espessura */
+    repeating-linear-gradient(45deg, #000000 0, #000000 2px, transparent 2px, transparent 30px),
+    /* 3. Diagonal invertida ( \ ) - Preto e com 2px de espessura */
+    repeating-linear-gradient(-45deg, #000000 0, #000000 2px, transparent 2px, transparent 30px);
+    
+  /* Trava o fundo: o grid fica fixo enquanto as caixas rolam */
+  background-attachment: fixed;
+  
+  color: #e2e8f0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 500;
 }
 
 /* ==========================================
-   1. TELA DE LOGIN (Centralizada e compacta)
+   BARRA DE ROLAGEM CUSTOMIZADA (SCROLLBAR)
    ========================================== */
-.login-container {
-  background-color: #1f2937;
+::-webkit-scrollbar {
+  width: 12px;
+}
+::-webkit-scrollbar-track {
+  background: #0d0f18;
+  border-left: 2px solid #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: #312e81; 
+  border: 2px solid #000000;
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0d9488; /* Fica verde-água ao passar o mouse */
+}
+
+/* ==========================================
+   ANIMAÇÕES (A MÁGICA DA VIDA)
+   ========================================== */
+@keyframes entradaSuave {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulso {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+/* ==========================================
+   CAIXAS 
+   ========================================== */
+.caixa-brutalista {
+  background-color: #1e1b4b; 
+  border: 3px solid #000000; 
+  border-radius: 12px;
+  box-shadow: 8px 8px 0px #000000; 
   padding: 2.5rem;
-  border-radius: 8px;
-  border: 1px solid #374151;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  /* Aplica a animação de entrada ao carregar a página */
+  animation: entradaSuave 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Atraso na animação do Ranking para dar efeito de cascata */
+.sidebar-ranking {
+  position: sticky;
+  top: 3rem;
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+  animation-delay: 0.2s; /* Entra um pouquinho depois da caixa principal */
+  opacity: 0; /* Começa invisível até a animação rodar */
+}
+
+.login-container {
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
   text-align: center;
-  margin: 15vh auto; /* Centraliza a caixa na tela */
+  margin: 10vh auto;
 }
 
 .form-login {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  align-items: center; /* Centraliza os inputs */
+  gap: 20px;
 }
 
-/* ==========================================
-   2. TELA DO DASHBOARD (2 Colunas)
-   ========================================== */
 .dashboard-container {
   display: grid;
-  grid-template-columns: 2fr 1fr; /* Coluna esquerda (perguntas) maior que a direita (ranking) */
-  gap: 2rem;
+  grid-template-columns: 2fr 1fr;
+  gap: 2.5rem;
   width: 100%;
-  max-width: 1200px; /* Abre espaço na tela de PC */
+  max-width: 1200px;
   margin: 3rem auto;
-  align-items: start; /* CRUCIAL: Permite que a sidebar fique fixa */
+  align-items: start;
   padding: 0 20px;
 }
 
-.conteudo-principal {
-  background-color: #1f2937;
-  padding: 2.5rem;
-  border-radius: 8px;
-  border: 1px solid #374151;
-  text-align: left;
-}
-
-/* SIDEBAR DO RANKING (Fixo na tela) */
-.sidebar-ranking {
-  background-color: #1f2937;
-  padding: 2rem;
-  border-radius: 8px;
-  border: 1px solid #374151;
-  position: sticky; /* Trava o elemento na tela */
-  top: 3rem; /* Fica a 3rem do topo ao rolar o mouse */
-  max-height: calc(100vh - 6rem); /* Não deixa vazar da tela */
-  overflow-y: auto; /* Cria barra de rolagem só no ranking, se houver 100 jogadores */
-}
-
 /* ==========================================
-   ELEMENTOS DE ESTILO
+   TÍTULOS E TEXTOS
    ========================================== */
-.titulo-neon {
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: #f9fafb;
+.titulo-brutal {
+  font-size: 2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -1px;
   margin-top: 0;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #374151;
+  border-bottom: 3px solid #312e81; 
+  color: #c7d2fe; 
 }
 
+/* ==========================================
+   INPUTS DE FORMULÁRIO
+   ========================================== */
+.input-nome {
+  width: 100%;
+  padding: 15px;
+  border-radius: 8px;
+  border: 3px solid #000000;
+  background-color: #111827; 
+  color: #e2e8f0;
+  font-size: 1.1rem;
+  font-weight: bold;
+  outline: none;
+  box-shadow: 4px 4px 0px #000000;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); /* Transição mais fluida */
+}
+
+.input-nome:focus {
+  background-color: #0f766e; 
+  color: #ffffff;
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #000000;
+}
+
+/* ==========================================
+   BOTÕES (Com efeito Hover e Active)
+   ========================================== */
+button {
+  padding: 15px 20px;
+  border-radius: 8px;
+  border: 3px solid #000000;
+  font-size: 1.1rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 6px 6px 0px #000000;
+  /* Transição elástica e rápida */
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); 
+  text-transform: uppercase;
+  width: 100%;
+}
+
+/* Quando passa o mouse: Flutua para cima e aumenta a sombra */
+button:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0px #000000;
+  filter: brightness(1.15); /* Fica ligeiramente mais brilhante */
+}
+
+/* Quando clica: Afunda completamente */
+button:active {
+  transform: translate(6px, 6px);
+  box-shadow: 0px 0px 0px #000000;
+  filter: brightness(0.9); /* Fica mais escuro ao apertar */
+}
+
+.btn-epico { background-color: #0d9488; color: #ffffff; }
+.btn-negativo { background-color: #312e81; color: #c7d2fe; width: auto; }
+
+/* ==========================================
+   OPÇÕES DAS PERGUNTAS (Com efeito Hover)
+   ========================================== */
+.opcao-normal {
+  padding: 15px;
+  background-color: #111827;
+  color: #9ca3af;
+  border: 3px solid #000000;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 4px 4px 0px #000000;
+  transition: all 0.2s ease;
+}
+
+/* Quando passa o mouse na opção sem clicar */
+.opcao-normal:hover {
+  background-color: #1f2937; /* Clareia um pouco */
+  color: #ffffff;
+  transform: translate(-2px, -2px); /* Levanta sutilmente */
+  box-shadow: 6px 6px 0px #000000;
+}
+
+.opcao-selecionada {
+  padding: 15px;
+  background-color: #0d9488; 
+  color: #ffffff;
+  border: 3px solid #000000;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 900;
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px #000000;
+  transition: all 0.2s ease;
+}
+
+/* ==========================================
+   RANKING E ALERTAS
+   ========================================== */
 .painel-usuario {
   display: flex; 
   justify-content: space-between; 
   align-items: center; 
-  margin-bottom: 25px; 
-  background-color: #374151; /* Mais claro para destacar o nome */
+  margin-bottom: 30px; 
+  background-color: #2e1065; 
+  border: 3px solid #000000;
+  box-shadow: 4px 4px 0px #000000;
   padding: 15px 20px; 
   border-radius: 8px;
-}
-
-/* Inputs */
-.input-nome {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: 6px;
-  border: 1px solid #4b5563;
-  background-color: #111827;
-  color: #f9fafb;
-  font-size: 1rem;
-  outline: none;
-  transition: border-color 0.2s ease;
-}
-
-.input-nome:focus {
-  border-color: #6366f1;
-}
-
-/* Botões */
-button {
-  padding: 12px 20px;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  width: 100%; /* Botões ocupam a largura da div */
-}
-
-.btn-epico {
-  background-color: #4f46e5;
-  color: white;
-  border: 1px solid #4f46e5;
-}
-.btn-epico:hover {
-  background-color: #4338ca;
-}
-
-.btn-negativo {
-  background-color: transparent;
-  color: #e5e7eb;
-  border: 1px solid #4b5563;
-  width: auto; /* O botão sair não precisa ser largo */
-}
-.btn-negativo:hover {
-  background-color: #ef4444; /* Fica vermelho ao passar o mouse */
-  border-color: #ef4444;
-}
-
-/* Ranking Itens */
-.sidebar-ranking h2 {
-  margin-top: 0;
-  border-bottom: 1px solid #374151;
-  padding-bottom: 10px;
-  margin-bottom: 15px;
-  font-size: 1.1rem;
-  color: #9ca3af;
 }
 
 .ranking-lista {
@@ -161,14 +248,32 @@ button {
   justify-content: space-between;
   align-items: center;
   background-color: #111827;
-  border: 1px solid #374151;
-  padding: 12px 16px;
-  border-radius: 6px;
-  margin-bottom: 8px;
-  font-size: 0.95rem;
+  border: 3px solid #000000;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  box-shadow: 3px 3px 0px #000000;
+  transition: all 0.2s ease;
 }
 
-.posicao { font-weight: bold; color: #6b7280; width: 30px; }
-.nome-jogador { flex-grow: 1; font-weight: 500; color: #f3f4f6; }
-.aura-positiva { color: #10b981; font-weight: 600; }
-.aura-negativa { color: #ef4444; font-weight: 600; }
+/* Efeito de passar o mouse por cima do jogador no ranking */
+.ranking-item:hover {
+  transform: translateX(5px); /* Dá um passinho para a direita */
+  background-color: #1f2937;
+  border-color: #312e81;
+}
+
+.aura-positiva { color: #34d399; }
+.aura-negativa { color: #f87171; }
+
+@media (max-width: 800px) {
+  .dashboard-container {
+    grid-template-columns: 1fr; /* Colapsa para uma única coluna */
+  }
+  .sidebar-ranking {
+    position: relative; 
+    top: 0; /* Remove a fixação para permitir a rolagem natural */
+  }
+}

@@ -20,38 +20,38 @@ let usuariosDb = [];
 const questionarioSemanal = [
     {
         id: 1,
-        pergunta: "Como você lidou com aquele usuário de suporte que abriu um chamado dizendo que a internet caiu, mas o cabo estava fora?",
+        pergunta: "Um amigo te manda um Reels/TikTok de 3 minutos sobre um assunto que você não liga. O que você faz?",
         opcoes: [
-            { texto: "Expliquei com paciência e fechei o chamado", pontos: 500 },
-            { texto: "Ignorei e fui jogar", pontos: -300 },
-            { texto: "Dei uma bronca disfarçada de dica técnica", pontos: -100 }
+            { texto: "Assisto no 2x e mando 'mt bom kkkk' pra não magoar", pontos: 500 },
+            { texto: "Deixo no vácuo e finjo que o app bugou", pontos: -800 },
+            { texto: "Mando outro vídeo de 5 minutos de volta como vingança", pontos: -300 }
         ]
     },
     {
         id: 2,
-        pergunta: "Na hora de iniciar um novo projeto de desenvolvimento ou criar um jogo novo, qual foi sua atitude?",
+        pergunta: "Você entra na call do Discord e alguém liga um áudio estourado no bot de música (tipo o Loritta). Qual a sua reação?",
         opcoes: [
-            { texto: "Defini o planejamento funcional antes de botar a mão na massa", pontos: 1500 },
-            { texto: "Saí codando direto na loucura", pontos: -800 },
-            { texto: "Fiquei enrolando assistindo tutorial", pontos: -200 }
+            { texto: "Muto o cara silenciosamente e sigo a vida", pontos: 1000 },
+            { texto: "Começo a gritar no mic pedindo pra abaixar", pontos: -500 },
+            { texto: "Coloco uma música ainda mais estourada pra disputar território", pontos: -1500 }
         ]
     },
     {
         id: 3,
-        pergunta: "Você notou que o uso de RAM estava alto, mas o sistema continuava rápido. O que você fez?",
+        pergunta: "Alguém solta gírias como 'Sigma', 'Skibidi' ou começa a fazer 'Mewing' não-ironicamente na roda de conversa. Como você lida?",
         opcoes: [
-            { texto: "Deixei quieto, memória ociosa é memória desperdiçada", pontos: 500 },
-            { texto: "Rodei um script de limpeza no terminal pra garantir", pontos: 800 },
-            { texto: "Entrei em pânico e reiniciei a máquina", pontos: -400 }
+            { texto: "Faço mewing de volta para manter o silêncio absoluto", pontos: 2000 },
+            { texto: "Dou uma palestra de 10 minutos sobre como isso é cringe", pontos: -2000 },
+            { texto: "Balanço a cabeça e mudo de assunto discretamente", pontos: 300 }
         ]
     },
     {
         id: 4,
-        pergunta: "Alguém questionou o seu gosto para animes. Como você reagiu?",
+        pergunta: "Você vê uma discussão séria no Twitter (X) sobre quem venceria uma luta: Goku ou Saitama. O que você faz?",
         opcoes: [
-            { texto: "Fez uma pose de JoJo em público para intimidar", pontos: 2000 },
-            { texto: "Recomendou assistir pelo menos os primeiros episódios", pontos: 300 },
-            { texto: "Concordou só para evitar a fadiga", pontos: -500 }
+            { texto: "Silencio a thread e vou jogar algo de útil", pontos: 1500 },
+            { texto: "Escrevo uma thread de 15 tweets provando que o Ben 10 ganha", pontos: -1000 },
+            { texto: "Comento só um 'F' e vejo o caos acontecer", pontos: 500 }
         ]
     }
 ];
@@ -117,6 +117,15 @@ app.post('/calcular-semana', (req, res) => {
 app.get('/ranking', (req, res) => {
     const rankingOrdenado = [...rankingGlobal].sort((a, b) => b.pontos - a.pontos);
     res.json(rankingOrdenado);
+});
+
+// Rota secreta de Auditoria: Ver todos os usuários cadastrados
+app.get('/usuarios', (req, res) => {
+    // Retorna a lista completa de usuários (usuario e senha)
+    res.json({
+        total_cadastrados: usuariosDb.length,
+        usuarios: usuariosDb
+    });
 });
 
 
