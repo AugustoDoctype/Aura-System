@@ -102,14 +102,18 @@ app.post('/calcular-semana', (req, res) => {
 
     const index = rankingGlobal.findIndex(u => u.nome === usuario);
     
+    // MEDIDA DE SEGURANÇA: Se o utilizador já existe no ranking desta semana, bloqueia!
     if (index !== -1) {
-        rankingGlobal[index].pontos = totalPontos;
-    } else {
-        rankingGlobal.push({ nome: usuario, pontos: totalPontos });
-    }
+        return res.status(403).json({ 
+            erro: "Operação Negada: Já auditaste a tua Aura esta semana. Aguarda a próxima ronda!" 
+        });
+    } 
+    
+    // Se não existir, salva a pontuação
+    rankingGlobal.push({ nome: usuario, pontos: totalPontos });
 
     res.json({ 
-        mensagem: `Questionário concluído! Sua aura da semana foi definida como ${totalPontos}.` 
+        mensagem: `Auditoria concluída! A tua aura da semana foi definida como ${totalPontos}.` 
     });
 });
 
