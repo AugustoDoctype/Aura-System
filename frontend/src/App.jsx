@@ -67,12 +67,14 @@ function App() {
     setRespostas({ ...respostas, [idPergunta]: pontos });
   };
 
-  const enviarQuestionario = async () => {
+ const enviarQuestionario = async () => {
     if (Object.keys(respostas).length < questionario.length) {
       setMensagem("Auditoria incompleta: Responda a todas as perguntas!");
       return;
     }
-    const totalPontos = Object.values(respostas).reduce((acc, pontos) => acc + pontos, 0);
+    
+    // CORREÇÃO: Forçando o JavaScript a tratar os pontos como Número (Number)
+    const totalPontos = Object.values(respostas).reduce((acc, pontos) => acc + Number(pontos), 0);
     
     try {
       const resposta = await fetch('http://localhost:3000/calcular-semana', {
@@ -87,7 +89,9 @@ function App() {
       } else {
         setMensagem(dados.erro); 
       }
-    } catch (error) { setMensagem("Erro ao enviar dados."); }
+    } catch (error) { 
+      setMensagem("Erro ao enviar dados."); 
+    }
   };
 
   // Função para exportar a div como Imagem PNG
