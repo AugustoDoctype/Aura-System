@@ -8,12 +8,13 @@ function App() {
   // ==========================================
   const [ranking, setRanking] = useState([]);
   const [mensagem, setMensagem] = useState('');
+  const [tipoMensagem, setTipoMensagem] = useState('erro'); // 'sucesso' ou 'erro'
   
   const [usuarioLogado, setUsuarioLogado] = useState(null);
   const [inputUsuario, setInputUsuario] = useState('');
   const [inputSenha, setInputSenha] = useState('');
   const [isRegistro, setIsRegistro] = useState(false);
-  const [telaAtual, setTelaAtual] = useState('dashboard'); 
+  const [telaAtual, setTelaAtual] = useState('dashboard'); // 'dashboard' ou 'perfil'
   
   const [questionario, setQuestionario] = useState([]);
   const [respostas, setRespostas] = useState({});
@@ -30,6 +31,7 @@ function App() {
       setQuestionario(await resQuestoes.json());
     } catch (error) {
       setMensagem("Erro ao conectar com o servidor.");
+      setTipoMensagem('erro');
     }
   };
 
@@ -49,6 +51,7 @@ function App() {
       if (resposta.ok) {
         if (isRegistro) {
           setMensagem(dados.mensagem);
+          setTipoMensagem('sucesso'); // Fundo verde para sucesso
           setIsRegistro(false); 
           setInputSenha(''); 
         } else {
@@ -56,8 +59,14 @@ function App() {
           setTelaAtual('dashboard');
           setMensagem('');
         }
-      } else { setMensagem(dados.erro); }
-    } catch (error) { setMensagem("Erro de conexão."); }
+      } else { 
+        setMensagem(dados.erro); 
+        setTipoMensagem('erro'); // Fundo vermelho para erro
+      }
+    } catch (error) { 
+      setMensagem("Erro de conexão."); 
+      setTipoMensagem('erro');
+    }
   };
 
   // ==========================================
@@ -67,13 +76,14 @@ function App() {
     setRespostas({ ...respostas, [idPergunta]: pontos });
   };
 
- const enviarQuestionario = async () => {
+  const enviarQuestionario = async () => {
     if (Object.keys(respostas).length < questionario.length) {
-      setMensagem("Auditoria incompleta: Responda a todas as perguntas!");
+      setMensagem("Auditoria incompleta: Responde a todas as perguntas!");
+      setTipoMensagem('erro');
       return;
     }
     
-    // CORREÇÃO: Forçando o JavaScript a tratar os pontos como Número (Number)
+    // Converte explicitamente para Number para evitar concatenação de strings
     const totalPontos = Object.values(respostas).reduce((acc, pontos) => acc + Number(pontos), 0);
     
     try {
@@ -85,24 +95,26 @@ function App() {
       const dados = await resposta.json();
       if (resposta.ok) {
         setMensagem(dados.mensagem);
+        setTipoMensagem('sucesso');
         carregarDadosBase(); 
       } else {
         setMensagem(dados.erro); 
+        setTipoMensagem('erro');
       }
     } catch (error) { 
       setMensagem("Erro ao enviar dados."); 
+      setTipoMensagem('erro');
     }
   };
 
-  // Função para exportar a div como Imagem PNG
   const exportarCartao = async () => {
     const elemento = document.getElementById('cartao-aura');
     if (!elemento) return;
     
     try {
       const canvas = await html2canvas(elemento, { 
-        backgroundColor: '#111827', // Mantém o fundo escuro do cartão
-        scale: 2 // Dobra a resolução para a imagem ficar com qualidade alta
+        backgroundColor: '#111827', 
+        scale: 2 
       });
       
       const imagem = canvas.toDataURL('image/png');
@@ -133,7 +145,6 @@ function App() {
     return { titulo: "Stand User", cor: "#c084fc" }; 
   };
   
-  // Calcula atributos no formato de status de Stand (A, B, C, D, E, S)
   const obterAtributos = (pontos) => {
     if (!jaRespondeu) return { suporte: '?', internet: '?', defesa: '?' };
     if (pontos < 0) return { suporte: 'E', internet: 'D', defesa: 'E' };
@@ -160,7 +171,21 @@ function App() {
           <input type="password" placeholder="Senha Secreta" className="input-nome" value={inputSenha} onChange={(e) => setInputSenha(e.target.value)} required />
           <button type="submit" className="btn-epico">{isRegistro ? 'Registrar' : 'Entrar'}</button>
         </form>
-        {mensagem && <div style={{ color: '#000', backgroundColor: '#f87171', padding: '10px', border: '3px solid #000', borderRadius: '8px', marginTop: '15px', fontWeight: '900' }}>{mensagem}</div>}
+        
+        {mensagem && (
+          <div style={{ 
+            color: '#000', 
+            backgroundColor: tipoMensagem === 'sucesso' ? '#34d399' : '#f87171', 
+            padding: '10px', 
+            border: '3px solid #000', 
+            borderRadius: '8px', 
+            marginTop: '15px', 
+            fontWeight: '900' 
+          }}>
+            {mensagem}
+          </div>
+        )}
+
         <p style={{ cursor: 'pointer', color: '#9CA3AF', marginTop: '25px', fontWeight: 'bold', textDecoration: 'underline' }} onClick={() => setIsRegistro(!isRegistro)}>
           {isRegistro ? 'Já tem acesso? Faça Login' : 'Criar nova conta!'}
         </p>
@@ -182,7 +207,6 @@ function App() {
           </div>
         </div>
 
-        {/* Div com ID para o html2canvas capturar perfeitamente */}
         <div id="cartao-aura" style={{ backgroundColor: '#111827', border: `3px solid ${minhaClasse.cor}`, padding: '30px', borderRadius: '12px', boxShadow: `4px 4px 0px ${minhaClasse.cor}`, marginBottom: '30px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px dashed #312e81', paddingBottom: '20px', marginBottom: '20px' }}>
             <div>
@@ -196,7 +220,6 @@ function App() {
             </div>
           </div>
 
-          {/* Status de Atributos */}
           <div style={{ display: 'flex', justifyContent: 'space-around', textAlign: 'center' }}>
             <div>
               <p style={{ margin: '0 0 5px 0', color: '#9ca3af', fontWeight: 'bold', fontSize: '0.9rem' }}>QI de Internet</p>
@@ -213,7 +236,6 @@ function App() {
           </div>
         </div>
 
-        {/* Galeria de Conquistas */}
         <h2 style={{ color: '#c7d2fe', borderBottom: '3px solid #312e81', paddingBottom: '10px' }}>Conquistas Desbloqueadas</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginTop: '20px' }}>
           
@@ -294,7 +316,16 @@ function App() {
         )}
         
         {mensagem && !jaRespondeu && (
-          <div style={{ color: '#000', marginTop: '20px', padding: '15px', backgroundColor: '#f87171', border: '3px solid #000', borderRadius: '8px', fontWeight: 'bold', boxShadow: '4px 4px 0px #000' }}>
+          <div style={{ 
+            color: '#000', 
+            marginTop: '20px', 
+            padding: '15px', 
+            backgroundColor: tipoMensagem === 'sucesso' ? '#34d399' : '#f87171', 
+            border: '3px solid #000', 
+            borderRadius: '8px', 
+            fontWeight: 'bold', 
+            boxShadow: '4px 4px 0px #000' 
+          }}>
             {mensagem}
           </div>
         )}
