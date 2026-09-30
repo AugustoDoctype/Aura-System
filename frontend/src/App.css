@@ -5,21 +5,22 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
-  background-color: #0d0f18; 
-  
-  /* A mágica da Malha Diagonal e Vinheta */
+  width: 100%;
+  min-height: 100vh;
+  background-color: #0d0f18;
+}
+
+body {
+  /* Malha Diagonal e Vinheta esticadas por toda a viewport */
   background-image: 
-    /* 1. Vinheta: Mantém as bordas mais escuras */
-    radial-gradient(circle at center, transparent 10%, #0d0f18 100%),
-    /* 2. Diagonal principal ( / ) - Preto e com 2px de espessura */
-    repeating-linear-gradient(45deg, #000000 0, #000000 2px, transparent 2px, transparent 30px),
-    /* 3. Diagonal invertida ( \ ) - Preto e com 2px de espessura */
-    repeating-linear-gradient(-45deg, #000000 0, #000000 2px, transparent 2px, transparent 30px);
+    radial-gradient(circle at center, transparent 20%, #0d0f18 100%),
+    repeating-linear-gradient(45deg, #000000 0, #000000 2px, transparent 2px, transparent 40px),
+    repeating-linear-gradient(-45deg, #000000 0, #000000 2px, transparent 2px, transparent 40px);
     
-  /* Trava o fundo: o grid fica fixo enquanto as caixas rolam */
+  background-repeat: repeat;
   background-attachment: fixed;
   
   color: #e2e8f0;
