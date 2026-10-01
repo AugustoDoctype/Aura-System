@@ -2,7 +2,13 @@ import { useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import './App.css';
 
-const API_URL = 'https://aura-system-4t1h.onrender.com';
+// ==========================================
+// CONFIGURAÇÃO AUTOMÁTICA DE AMBIENTE
+// O sistema deteta sozinho se está a correr no localhost ou na Vercel
+// ==========================================
+const API_URL = window.location.hostname === 'localhost' 
+  ? 'http://localhost:3000' 
+  : 'https://aura-system-4t1h.onrender.com';
 
 // ==========================================
 // CONSTANTES GLOBAIS
