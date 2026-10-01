@@ -41,7 +41,14 @@ body {
 
 .login-container {
   max-width: 450px;
-  margin: 10vh auto;
+  width: 90%; /* Garante que não quebra no celular */
+  
+  /* Cravando a caixa exatamente no centro da tela */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
   text-align: center;
 }
 
