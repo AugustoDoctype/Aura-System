@@ -2,25 +2,43 @@ import { useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import './App.css';
 
+// Constante fora do componente para evitar recriação em cada render
+const FRASES_LOADING = [
+  "Auditando histórico de chamadas no Discord...",
+  "Medindo nível de Cringe nas últimas 24 horas...",
+  "Consultando o Conselho Supremo dos Stand Users...",
+  "Calculando taxa de sobrevivência em clutch 1v5...",
+  "Analisando se você assistiu ao vídeo de 3 minutos...",
+  "Sincronizando com os servidores centrais da Aura...",
+  "Verificando histórico de figurinhas do WhatsApp..."
+];
+
 function App() {
   // ==========================================
   // 1. ESTADOS (Variáveis da Tela)
   // ==========================================
   const [ranking, setRanking] = useState([]);
   const [mensagem, setMensagem] = useState('');
-  const [tipoMensagem, setTipoMensagem] = useState('erro'); // 'sucesso' ou 'erro'
+  const [tipoMensagem, setTipoMensagem] = useState('erro'); // 'sucesso' | 'erro'
   
+  // Autenticação e Navegação
   const [usuarioLogado, setUsuarioLogado] = useState(null);
   const [inputUsuario, setInputUsuario] = useState('');
   const [inputSenha, setInputSenha] = useState('');
   const [isRegistro, setIsRegistro] = useState(false);
-  const [telaAtual, setTelaAtual] = useState('dashboard'); // 'dashboard' ou 'perfil'
+  const [telaAtual, setTelaAtual] = useState('dashboard'); // 'dashboard' | 'perfil'
   
+  // Questionário
   const [questionario, setQuestionario] = useState([]);
   const [respostas, setRespostas] = useState({});
 
+  // Animação de Carregamento (Modal)
+  const [calculando, setCalculando] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingTextoIndex, setLoadingTextoIndex] = useState(0);
+
   // ==========================================
-  // 2. COMUNICAÇÃO COM A API
+  // 2. COMUNICAÇÃO COM A API (BACKEND)
   // ==========================================
   const carregarDadosBase = async () => {
     try {
@@ -35,7 +53,9 @@ function App() {
     }
   };
 
-  useEffect(() => { carregarDadosBase(); }, []);
+  useEffect(() => {
+    carregarDadosBase();
+  }, []);
 
   const autenticar = async (e) => {
     e.preventDefault(); 
@@ -51,7 +71,7 @@ function App() {
       if (resposta.ok) {
         if (isRegistro) {
           setMensagem(dados.mensagem);
-          setTipoMensagem('sucesso'); // Fundo verde para sucesso
+          setTipoMensagem('sucesso');
           setIsRegistro(false); 
           setInputSenha(''); 
         } else {
@@ -61,7 +81,7 @@ function App() {
         }
       } else { 
         setMensagem(dados.erro); 
-        setTipoMensagem('erro'); // Fundo vermelho para erro
+        setTipoMensagem('erro');
       }
     } catch (error) { 
       setMensagem("Erro de conexão."); 
@@ -70,7 +90,7 @@ function App() {
   };
 
   // ==========================================
-  // 3. MECÂNICA DE AURA, PROGRESSO E EXPORTAÇÃO
+  // 3. AÇÕES E CÁLCULOS
   // ==========================================
   const selecionarOpcao = (idPergunta, pontos) => {
     setRespostas({ ...respostas, [idPergunta]: pontos });
@@ -78,33 +98,54 @@ function App() {
 
   const enviarQuestionario = async () => {
     if (Object.keys(respostas).length < questionario.length) {
-      setMensagem("Auditoria incompleta: Responde a todas as perguntas!");
+      setMensagem("Auditoria incompleta: Responda a todas as perguntas!");
       setTipoMensagem('erro');
       return;
     }
     
-    // Converte explicitamente para Number para evitar concatenação de strings
-    const totalPontos = Object.values(respostas).reduce((acc, pontos) => acc + Number(pontos), 0);
-    
-    try {
-      const resposta = await fetch('http://localhost:3000/calcular-semana', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usuario: usuarioLogado, totalPontos })
+    // Inicia Pop-up de Carregamento
+    setCalculando(true);
+    setLoadingProgress(0);
+
+    const intervalo = setInterval(() => {
+      setLoadingProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(intervalo);
+          return 100;
+        }
+        return prev + 15;
       });
-      const dados = await resposta.json();
-      if (resposta.ok) {
-        setMensagem(dados.mensagem);
-        setTipoMensagem('sucesso');
-        carregarDadosBase(); 
-      } else {
-        setMensagem(dados.erro); 
+      setLoadingTextoIndex((prev) => (prev + 1) % FRASES_LOADING.length);
+    }, 350);
+
+    // Envio com delay para efeito visual de "processamento"
+    setTimeout(async () => {
+      const totalPontos = Object.values(respostas).reduce((acc, pontos) => acc + Number(pontos), 0);
+      
+      try {
+        const resposta = await fetch('http://localhost:3000/calcular-semana', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ usuario: usuarioLogado, totalPontos })
+        });
+        const dados = await resposta.json();
+        
+        setCalculando(false);
+        
+        if (resposta.ok) {
+          setMensagem(dados.mensagem);
+          setTipoMensagem('sucesso');
+          carregarDadosBase(); 
+        } else {
+          setMensagem(dados.erro); 
+          setTipoMensagem('erro');
+        }
+      } catch (error) { 
+        setCalculando(false);
+        setMensagem("Erro ao enviar dados."); 
         setTipoMensagem('erro');
       }
-    } catch (error) { 
-      setMensagem("Erro ao enviar dados."); 
-      setTipoMensagem('erro');
-    }
+    }, 2500);
   };
 
   const exportarCartao = async () => {
@@ -127,13 +168,13 @@ function App() {
     }
   };
 
+  // Funções Auxiliares de Status
   const calcularProgresso = () => {
     if (questionario.length === 0) return 0;
     return Math.round((Object.keys(respostas).length / questionario.length) * 100);
   };
-  const progresso = calcularProgresso();
-  const jaRespondeu = ranking.some(user => user.nome === usuarioLogado);
 
+  const jaRespondeu = ranking.some(user => user.nome === usuarioLogado);
   const dadosMeuUsuario = ranking.find(user => user.nome === usuarioLogado);
   const minhaAura = dadosMeuUsuario ? dadosMeuUsuario.pontos : 0;
 
@@ -153,6 +194,7 @@ function App() {
     return { suporte: 'S', internet: 'S', defesa: 'S' };
   };
 
+  const progresso = calcularProgresso();
   const minhaClasse = obterClasseAura(minhaAura);
   const meusAtributos = obterAtributos(minhaAura);
 
@@ -166,10 +208,27 @@ function App() {
         <h2 style={{ fontSize: '1.2rem', marginBottom: '20px', fontWeight: 'bold' }}>
           {isRegistro ? 'Criar Conta' : 'Acesso ao Painel'}
         </h2>
+        
         <form className="form-login" onSubmit={autenticar}>
-          <input type="text" placeholder="Nome de Usuário" className="input-nome" value={inputUsuario} onChange={(e) => setInputUsuario(e.target.value)} required />
-          <input type="password" placeholder="Senha Secreta" className="input-nome" value={inputSenha} onChange={(e) => setInputSenha(e.target.value)} required />
-          <button type="submit" className="btn-epico">{isRegistro ? 'Registrar' : 'Entrar'}</button>
+          <input 
+            type="text" 
+            placeholder="Nome de Usuário" 
+            className="input-nome" 
+            value={inputUsuario} 
+            onChange={(e) => setInputUsuario(e.target.value)} 
+            required 
+          />
+          <input 
+            type="password" 
+            placeholder="Senha Secreta" 
+            className="input-nome" 
+            value={inputSenha} 
+            onChange={(e) => setInputSenha(e.target.value)} 
+            required 
+          />
+          <button type="submit" className="btn-epico">
+            {isRegistro ? 'Registrar' : 'Entrar'}
+          </button>
         </form>
         
         {mensagem && (
@@ -186,7 +245,10 @@ function App() {
           </div>
         )}
 
-        <p style={{ cursor: 'pointer', color: '#9CA3AF', marginTop: '25px', fontWeight: 'bold', textDecoration: 'underline' }} onClick={() => setIsRegistro(!isRegistro)}>
+        <p 
+          style={{ cursor: 'pointer', color: '#9CA3AF', marginTop: '25px', fontWeight: 'bold', textDecoration: 'underline' }} 
+          onClick={() => setIsRegistro(!isRegistro)}
+        >
           {isRegistro ? 'Já tem acesso? Faça Login' : 'Criar nova conta!'}
         </p>
       </div>
@@ -238,7 +300,6 @@ function App() {
 
         <h2 style={{ color: '#c7d2fe', borderBottom: '3px solid #312e81', paddingBottom: '10px' }}>Conquistas Desbloqueadas</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginTop: '20px' }}>
-          
           <div style={{ backgroundColor: '#111827', border: '3px solid #000', padding: '15px', borderRadius: '8px', textAlign: 'center' }}>
             <div style={{ fontSize: '2rem', marginBottom: '10px' }}>🌐</div>
             <h4 style={{ margin: '0 0 5px 0', color: '#e2e8f0' }}>Acesso Concedido</h4>
@@ -256,7 +317,6 @@ function App() {
             <h4 style={{ margin: '0 0 5px 0', color: '#e2e8f0' }}>Stand User</h4>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#9ca3af' }}>Atingiu o rank máximo do sistema.</p>
           </div>
-
         </div>
       </div>
     );
@@ -267,6 +327,7 @@ function App() {
   // ==========================================
   return (
     <div className="dashboard-container">
+      {/* COLUNA ESQUERDA: AUDITORIA */}
       <div className="caixa-brutalista">
         <h1 className="titulo-brutal">Auditoria Semanal</h1>
         
@@ -331,6 +392,7 @@ function App() {
         )}
       </div>
 
+      {/* COLUNA DIREITA: RANKING */}
       <div className="caixa-brutalista sidebar-ranking">
         <h2 style={{ borderBottom: '3px solid #312e81', paddingBottom: '10px', marginTop: 0, fontWeight: '900', color: '#c7d2fe' }}>Ranking Global</h2>
         <ul className="ranking-lista">
@@ -347,6 +409,42 @@ function App() {
           )}
         </ul>
       </div>
+
+      {/* POP-UP MODAL: CALCULANDO AURA */}
+      {calculando && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(5px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999
+        }}>
+          <div className="caixa-brutalista" style={{ maxWidth: '500px', width: '90%', textAlign: 'center', animation: 'none' }}>
+            <h2 style={{ color: '#0d9488', fontSize: '1.4rem', margin: '0 0 15px 0', textTransform: 'uppercase' }}>
+              ⚡ [ PROCESSANDO AUDITORIA ] ⚡
+            </h2>
+            
+            <div style={{ backgroundColor: '#111827', border: '3px solid #000', borderRadius: '8px', height: '24px', overflow: 'hidden', marginBottom: '20px' }}>
+              <div style={{
+                width: `${loadingProgress}%`,
+                backgroundColor: '#34d399',
+                height: '100%',
+                transition: 'width 0.3s ease'
+              }}></div>
+            </div>
+
+            <p style={{ color: '#c7d2fe', fontSize: '1rem', fontWeight: 'bold', minHeight: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {FRASES_LOADING[loadingTextoIndex]}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
