@@ -1,5 +1,5 @@
 /* ==========================================
-   RESET & FUNDO (Oceano Noturno)
+   RESET & FUNDO (Oceano Noturno & Malha)
    ========================================== */
 * {
   box-sizing: border-box;
@@ -14,230 +14,172 @@ html, body {
 }
 
 body {
-  /* Malha Diagonal e Vinheta esticadas por toda a viewport */
   background-image: 
     radial-gradient(circle at center, transparent 20%, #0d0f18 100%),
     repeating-linear-gradient(45deg, #000000 0, #000000 2px, transparent 2px, transparent 40px),
     repeating-linear-gradient(-45deg, #000000 0, #000000 2px, transparent 2px, transparent 40px);
-    
   background-repeat: repeat;
   background-attachment: fixed;
-  
   color: #e2e8f0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-weight: 500;
 }
 
 /* ==========================================
-   BARRA DE ROLAGEM CUSTOMIZADA (SCROLLBAR)
+   LAYOUT PRINCIPAL
    ========================================== */
-::-webkit-scrollbar {
-  width: 12px;
-}
-::-webkit-scrollbar-track {
-  background: #0d0f18;
-  border-left: 2px solid #000000;
-}
-::-webkit-scrollbar-thumb {
-  background: #312e81; 
-  border: 2px solid #000000;
-  border-radius: 6px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #0d9488; /* Fica verde-água ao passar o mouse */
-}
-
-/* ==========================================
-   ANIMAÇÕES (A MÁGICA DA VIDA)
-   ========================================== */
-@keyframes entradaSuave {
-  0% {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pulso {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-  100% { transform: scale(1); }
-}
-
-/* ==========================================
-   CAIXAS 
-   ========================================== */
-.caixa-brutalista {
-  background-color: #1e1b4b; 
-  border: 3px solid #000000; 
-  border-radius: 12px;
-  box-shadow: 8px 8px 0px #000000; 
-  padding: 2.5rem;
-  /* Aplica a animação de entrada ao carregar a página */
-  animation: entradaSuave 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-/* Atraso na animação do Ranking para dar efeito de cascata */
-.sidebar-ranking {
-  position: sticky;
-  top: 3rem;
-  max-height: calc(100vh - 6rem);
-  overflow-y: auto;
-  animation-delay: 0.2s; /* Entra um pouquinho depois da caixa principal */
-  opacity: 0; /* Começa invisível até a animação rodar */
-}
-
-.login-container {
-  width: 100%;
-  max-width: 450px;
-  text-align: center;
-  margin: 10vh auto;
-}
-
-.form-login {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
 .dashboard-container {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 2.5rem;
-  width: 100%;
+  gap: 20px;
   max-width: 1200px;
   margin: 3rem auto;
-  align-items: start;
-  padding: 0 20px;
+  width: 95%;
+}
+
+.login-container {
+  max-width: 450px;
+  margin: 10vh auto;
+  text-align: center;
 }
 
 /* ==========================================
-   TÍTULOS E TEXTOS
+   CAIXAS E TIPOGRAFIA BRUTALISTA
    ========================================== */
+.caixa-brutalista {
+  background-color: #1e1b4b;
+  border: 4px solid #000;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 8px 8px 0px #000;
+  animation: fadeIn 0.4s ease-out;
+}
+
 .titulo-brutal {
-  font-size: 2rem;
-  font-weight: 900;
+  font-size: 2.5rem;
+  color: #a5b4fc;
   text-transform: uppercase;
-  letter-spacing: -1px;
+  font-weight: 900;
+  text-shadow: 3px 3px 0px #000;
   margin-top: 0;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 3px solid #312e81; 
-  color: #c7d2fe; 
+  border-bottom: 4px solid #000;
+  padding-bottom: 15px;
 }
 
 /* ==========================================
-   INPUTS DE FORMULÁRIO
+   FORMULÁRIOS E BOTÕES
    ========================================== */
+.form-login {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
 .input-nome {
-  width: 100%;
   padding: 15px;
-  border-radius: 8px;
-  border: 3px solid #000000;
-  background-color: #111827; 
-  color: #e2e8f0;
   font-size: 1.1rem;
-  font-weight: bold;
+  background-color: #111827;
+  color: #fff;
+  border: 3px solid #000;
+  border-radius: 8px;
   outline: none;
-  box-shadow: 4px 4px 0px #000000;
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); /* Transição mais fluida */
+  font-weight: bold;
 }
 
 .input-nome:focus {
-  background-color: #0f766e; 
-  color: #ffffff;
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0px #000000;
+  border-color: #34d399;
 }
 
-/* ==========================================
-   BOTÕES (Com efeito Hover e Active)
-   ========================================== */
-button {
-  padding: 15px 20px;
-  border-radius: 8px;
-  border: 3px solid #000000;
-  font-size: 1.1rem;
+.btn-epico {
+  background-color: #0d9488;
+  color: #000;
+  font-size: 1.2rem;
   font-weight: 900;
-  cursor: pointer;
-  box-shadow: 6px 6px 0px #000000;
-  /* Transição elástica e rápida */
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); 
   text-transform: uppercase;
+  padding: 15px;
+  border: 3px solid #000;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0px #000;
+  transition: all 0.1s ease;
   width: 100%;
 }
 
-/* Quando passa o mouse: Flutua para cima e aumenta a sombra */
-button:hover {
-  transform: translate(-3px, -3px);
-  box-shadow: 9px 9px 0px #000000;
-  filter: brightness(1.15); /* Fica ligeiramente mais brilhante */
+.btn-epico:hover {
+  background-color: #14b8a6;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #000;
 }
 
-/* Quando clica: Afunda completamente */
-button:active {
-  transform: translate(6px, 6px);
-  box-shadow: 0px 0px 0px #000000;
-  filter: brightness(0.9); /* Fica mais escuro ao apertar */
+.btn-epico:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #000;
 }
 
-.btn-epico { background-color: #0d9488; color: #ffffff; }
-.btn-negativo { background-color: #312e81; color: #c7d2fe; width: auto; }
+.btn-negativo {
+  background-color: #f43f5e;
+  color: #000;
+  font-weight: 900;
+  padding: 8px 20px;
+  border: 3px solid #000;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px #000;
+  transition: all 0.1s;
+}
+
+.btn-negativo:hover {
+  background-color: #fb7185;
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px #000;
+}
+
+.btn-negativo:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #000;
+}
 
 /* ==========================================
-   OPÇÕES DAS PERGUNTAS (Com efeito Hover)
+   COMPONENTES DE QUESTIONÁRIO
    ========================================== */
-.opcao-normal {
-  padding: 15px;
+.painel-usuario {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   background-color: #111827;
-  color: #9ca3af;
-  border: 3px solid #000000;
+  padding: 15px 20px;
+  border: 3px solid #000;
   border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  box-shadow: 4px 4px 0px #000000;
-  transition: all 0.2s ease;
+  margin-bottom: 25px;
 }
 
-/* Quando passa o mouse na opção sem clicar */
+.opcao-normal, .opcao-selecionada {
+  display: block;
+  padding: 15px;
+  border: 3px solid #000;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+  background-color: #374151;
+  color: #f3f4f6;
+}
+
 .opcao-normal:hover {
-  background-color: #1f2937; /* Clareia um pouco */
-  color: #ffffff;
-  transform: translate(-2px, -2px); /* Levanta sutilmente */
-  box-shadow: 6px 6px 0px #000000;
+  background-color: #4b5563;
+  transform: translateX(5px);
 }
 
 .opcao-selecionada {
-  padding: 15px;
-  background-color: #0d9488; 
-  color: #ffffff;
-  border: 3px solid #000000;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 900;
-  transform: translate(4px, 4px);
-  box-shadow: 0px 0px 0px #000000;
-  transition: all 0.2s ease;
+  background-color: #3b82f6;
+  color: #000;
+  transform: translateX(10px);
+  box-shadow: -4px 4px 0px #000;
 }
 
 /* ==========================================
-   RANKING E ALERTAS
+   RANKING LATERAL
    ========================================== */
-.painel-usuario {
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  margin-bottom: 30px; 
-  background-color: #2e1065; 
-  border: 3px solid #000000;
-  box-shadow: 4px 4px 0px #000000;
-  padding: 15px 20px; 
-  border-radius: 8px;
-}
-
 .ranking-lista {
   list-style: none;
   padding: 0;
@@ -249,32 +191,111 @@ button:active {
   justify-content: space-between;
   align-items: center;
   background-color: #111827;
-  border: 3px solid #000000;
-  padding: 15px;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  border: 3px solid #000;
   border-radius: 8px;
-  margin-bottom: 12px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  box-shadow: 3px 3px 0px #000000;
-  transition: all 0.2s ease;
+  font-weight: 900;
 }
 
-/* Efeito de passar o mouse por cima do jogador no ranking */
-.ranking-item:hover {
-  transform: translateX(5px); /* Dá um passinho para a direita */
+.aura-positiva { color: #34d399; font-size: 1.2rem; }
+.aura-negativa { color: #f87171; font-size: 1.2rem; }
+
+/* ==========================================
+   CARTÃO EXPORTÁVEL (PERFIL)
+   ========================================== */
+#cartao-aura {
+  position: relative;
+  overflow: hidden;
+  min-width: 550px; 
+}
+
+/* Carimbo Oficial */
+.selo-carimbo-container {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  transform: rotate(-12deg);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.selo-carimbo {
+  border: 4px double currentColor;
+  padding: 8px 16px;
+  text-align: center;
+  background-color: rgba(17, 24, 39, 0.95);
+  box-shadow: 0 0 0 2px #000000, 4px 4px 0px #000000;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-family: monospace;
+}
+
+.selo-topo {
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  font-weight: 800;
+  opacity: 0.85;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 3px;
+  margin-bottom: 4px;
+}
+
+.selo-principal {
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 0px #000000;
+}
+
+.selo-rodape {
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+  opacity: 0.85;
+  border-top: 1px dashed currentColor;
+  padding-top: 3px;
+  margin-top: 4px;
+}
+
+/* Barras Visuais de Atributos */
+.barra-atributo-bg {
   background-color: #1f2937;
-  border-color: #312e81;
+  border: 2px solid #000;
+  height: 12px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 8px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
 }
 
-.aura-positiva { color: #34d399; }
-.aura-negativa { color: #f87171; }
+.barra-atributo-fill {
+  height: 100%;
+}
 
-@media (max-width: 800px) {
+/* Rodapé Criptográfico */
+.cartao-rodapé-tech {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 2px dashed #312e81;
+  padding-top: 15px;
+  margin-top: 25px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* ==========================================
+   ANIMAÇÕES E RESPONSIVIDADE
+   ========================================== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 900px) {
   .dashboard-container {
-    grid-template-columns: 1fr; /* Colapsa para uma única coluna */
-  }
-  .sidebar-ranking {
-    position: relative; 
-    top: 0; /* Remove a fixação para permitir a rolagem natural */
+    grid-template-columns: 1fr;
   }
 }

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import './App.css';
 
-// Constante fora do componente para evitar recriação em cada render
 const FRASES_LOADING = [
   "Auditando histórico de chamadas no Discord...",
   "Medindo nível de Cringe nas últimas 24 horas...",
@@ -48,7 +47,7 @@ function App() {
       const resQuestoes = await fetch('http://localhost:3000/questionario');
       setQuestionario(await resQuestoes.json());
     } catch (error) {
-      setMensagem("Erro ao conectar com o servidor.");
+      setMensagem("Erro ao conectar com o servidor. O backend está rodando?");
       setTipoMensagem('erro');
     }
   };
@@ -90,7 +89,7 @@ function App() {
   };
 
   // ==========================================
-  // 3. AÇÕES E CÁLCULOS
+  // 3. AÇÕES, PROGRESSO E CÁLCULOS
   // ==========================================
   const selecionarOpcao = (idPergunta, pontos) => {
     setRespostas({ ...respostas, [idPergunta]: pontos });
@@ -118,8 +117,9 @@ function App() {
       setLoadingTextoIndex((prev) => (prev + 1) % FRASES_LOADING.length);
     }, 350);
 
-    // Envio com delay para efeito visual de "processamento"
+    // Envio com delay para o efeito visual de "processamento"
     setTimeout(async () => {
+      // O Number() garante que os pontos sejam somados matematicamente, não colados como texto
       const totalPontos = Object.values(respostas).reduce((acc, pontos) => acc + Number(pontos), 0);
       
       try {
@@ -148,6 +148,7 @@ function App() {
     }, 2500);
   };
 
+  // Função para exportar a imagem do Cartão
   const exportarCartao = async () => {
     const elemento = document.getElementById('cartao-aura');
     if (!elemento) return;
@@ -155,7 +156,7 @@ function App() {
     try {
       const canvas = await html2canvas(elemento, { 
         backgroundColor: '#111827', 
-        scale: 2 
+        scale: 2 // Dobra a resolução da imagem PNG
       });
       
       const imagem = canvas.toDataURL('image/png');
@@ -168,7 +169,9 @@ function App() {
     }
   };
 
-  // Funções Auxiliares de Status
+  // ==========================================
+  // 4. LÓGICA DE ATRIBUTOS E CLASSES
+  // ==========================================
   const calcularProgresso = () => {
     if (questionario.length === 0) return 0;
     return Math.round((Object.keys(respostas).length / questionario.length) * 100);
@@ -187,11 +190,31 @@ function App() {
   };
   
   const obterAtributos = (pontos) => {
-    if (!jaRespondeu) return { suporte: '?', internet: '?', defesa: '?' };
-    if (pontos < 0) return { suporte: 'E', internet: 'D', defesa: 'E' };
-    if (pontos <= 2000) return { suporte: 'C', internet: 'C', defesa: 'C' };
-    if (pontos <= 4000) return { suporte: 'A', internet: 'B', defesa: 'A' };
-    return { suporte: 'S', internet: 'S', defesa: 'S' };
+    if (!jaRespondeu) return { 
+      internet: { nota: '?', pct: 0 }, 
+      suporte: { nota: '?', pct: 0 }, 
+      defesa: { nota: '?', pct: 0 } 
+    };
+    if (pontos < 0) return { 
+      internet: { nota: 'E', pct: 15 }, 
+      suporte: { nota: 'E', pct: 10 }, 
+      defesa: { nota: 'D', pct: 20 } 
+    };
+    if (pontos <= 2000) return { 
+      internet: { nota: 'C', pct: 45 }, 
+      suporte: { nota: 'C', pct: 50 }, 
+      defesa: { nota: 'C', pct: 40 } 
+    };
+    if (pontos <= 4000) return { 
+      internet: { nota: 'A', pct: 80 }, 
+      suporte: { nota: 'A', pct: 85 }, 
+      defesa: { nota: 'B', pct: 70 } 
+    };
+    return { 
+      internet: { nota: 'S', pct: 100 }, 
+      suporte: { nota: 'S', pct: 100 }, 
+      defesa: { nota: 'S', pct: 95 } 
+    };
   };
 
   const progresso = calcularProgresso();
@@ -199,7 +222,7 @@ function App() {
   const meusAtributos = obterAtributos(minhaAura);
 
   // ==========================================
-  // 4. RENDERIZAÇÃO: TELA DE LOGIN
+  // 5. RENDERIZAÇÃO: TELA DE LOGIN
   // ==========================================
   if (!usuarioLogado) {
     return (
@@ -256,9 +279,11 @@ function App() {
   }
 
   // ==========================================
-  // 5. RENDERIZAÇÃO: PERFIL DO OPERADOR
+  // 6. RENDERIZAÇÃO: PERFIL DO OPERADOR E CARTÃO
   // ==========================================
   if (telaAtual === 'perfil') {
+    const hashAutenticidade = `AURA-SYS-${btoa(usuarioLogado || 'GUEST').substring(0, 8).toUpperCase()}-2026`;
+
     return (
       <div className="caixa-brutalista" style={{ maxWidth: '800px', margin: '3rem auto', width: '90%' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -269,35 +294,89 @@ function App() {
           </div>
         </div>
 
-        <div id="cartao-aura" style={{ backgroundColor: '#111827', border: `3px solid ${minhaClasse.cor}`, padding: '30px', borderRadius: '12px', boxShadow: `4px 4px 0px ${minhaClasse.cor}`, marginBottom: '30px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px dashed #312e81', paddingBottom: '20px', marginBottom: '20px' }}>
-            <div>
-              <h2 style={{ fontSize: '2rem', margin: '0 0 10px 0', color: '#ffffff' }}>{usuarioLogado}</h2>
-              <p style={{ margin: 0, color: '#9ca3af', fontSize: '1.1rem', fontWeight: 'bold' }}>Classe Registrada:</p>
-              <h3 style={{ margin: 0, color: minhaClasse.cor, fontSize: '1.5rem', textTransform: 'uppercase' }}>{minhaClasse.titulo}</h3>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <p style={{ margin: 0, color: '#9ca3af', fontSize: '1.1rem', fontWeight: 'bold' }}>Aura Total:</p>
-              <h1 style={{ margin: 0, fontSize: '3.5rem', color: minhaClasse.cor }}>{jaRespondeu ? minhaAura : '???'}</h1>
+        {/* ================= CARTÃO ================= */}
+        <div id="cartao-aura" style={{ 
+          border: `3px solid ${minhaClasse.cor}`, 
+          padding: '30px', 
+          borderRadius: '12px', 
+          boxShadow: `6px 6px 0px ${minhaClasse.cor}`, 
+          marginBottom: '30px',
+          backgroundColor: '#111827'
+        }}>
+          
+          {/* CARIMBO OFICIAL */}
+          <div className="selo-carimbo-container">
+            <div className="selo-carimbo" style={{ color: minhaClasse.cor }}>
+              <div className="selo-topo">AURA-SYS // DEPT</div>
+              <div className="selo-principal">
+                {minhaAura >= 0 ? '✓ AUDITADO' : '✗ REJEITADO'}
+              </div>
+              <div className="selo-rodape">
+                {minhaAura >= 0 ? 'STATUS: APROVADO' : 'STATUS: LOW AURA'}
+              </div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-around', textAlign: 'center' }}>
-            <div>
-              <p style={{ margin: '0 0 5px 0', color: '#9ca3af', fontWeight: 'bold', fontSize: '0.9rem' }}>QI de Internet</p>
-              <span style={{ fontSize: '1.8rem', color: '#ffffff', fontWeight: '900' }}>{meusAtributos.internet}</span>
+          {/* DADOS PRINCIPAIS E PONTOS */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'flex-start',
+            borderBottom: '2px dashed #312e81', 
+            paddingBottom: '20px', 
+            marginBottom: '25px',
+            position: 'relative',
+            zIndex: 1 
+          }}>
+            <div style={{ flex: 1, paddingRight: '20px' }}>
+              <p style={{ margin: 0, color: '#6b7280', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase' }}>OPERADOR_ID</p>
+              <h2 style={{ fontSize: '2.2rem', margin: '0 0 10px 0', color: '#ffffff', wordBreak: 'break-word' }}>{usuarioLogado}</h2>
+              <p style={{ margin: 0, color: '#9ca3af', fontSize: '0.9rem', fontWeight: 'bold' }}>CLASSE REGISTRADA:</p>
+              <h3 style={{ margin: 0, color: minhaClasse.cor, fontSize: '1.4rem', textTransform: 'uppercase' }}>{minhaClasse.titulo}</h3>
             </div>
-            <div>
-              <p style={{ margin: '0 0 5px 0', color: '#9ca3af', fontWeight: 'bold', fontSize: '0.9rem' }}>Resiliência de TI</p>
-              <span style={{ fontSize: '1.8rem', color: '#ffffff', fontWeight: '900' }}>{meusAtributos.suporte}</span>
+            
+            {/* ZONA SEGURA DO CARIMBO: paddingRight de 190px garante espaço livre */}
+            <div style={{ textAlign: 'right', paddingRight: '190px' }}>
+              <p style={{ margin: 0, color: '#9ca3af', fontSize: '0.9rem', fontWeight: 'bold' }}>AURA TOTAL:</p>
+              <h1 style={{ margin: 0, fontSize: '3.8rem', color: minhaClasse.cor, lineHeight: '1' }}>{jaRespondeu ? minhaAura : '???'}</h1>
             </div>
+          </div>
+
+          {/* ATRIBUTOS */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '25px', textAlign: 'center', position: 'relative', zIndex: 1 }}>
             <div>
-              <p style={{ margin: '0 0 5px 0', color: '#9ca3af', fontWeight: 'bold', fontSize: '0.9rem' }}>Defesa Anti-Cringe</p>
-              <span style={{ fontSize: '1.8rem', color: '#ffffff', fontWeight: '900' }}>{meusAtributos.defesa}</span>
+              <p style={{ margin: '0 0 4px 0', color: '#9ca3af', fontWeight: 'bold', fontSize: '0.85rem' }}>QI DE INTERNET</p>
+              <span style={{ fontSize: '2rem', color: '#ffffff', fontWeight: '900' }}>{meusAtributos.internet.nota}</span>
+              <div className="barra-atributo-bg">
+                <div className="barra-atributo-fill" style={{ width: `${meusAtributos.internet.pct}%`, backgroundColor: minhaClasse.cor }}></div>
+              </div>
             </div>
+
+            <div>
+              <p style={{ margin: '0 0 4px 0', color: '#9ca3af', fontWeight: 'bold', fontSize: '0.85rem' }}>RESILIÊNCIA DE TI</p>
+              <span style={{ fontSize: '2rem', color: '#ffffff', fontWeight: '900' }}>{meusAtributos.suporte.nota}</span>
+              <div className="barra-atributo-bg">
+                <div className="barra-atributo-fill" style={{ width: `${meusAtributos.suporte.pct}%`, backgroundColor: minhaClasse.cor }}></div>
+              </div>
+            </div>
+
+            <div>
+              <p style={{ margin: '0 0 4px 0', color: '#9ca3af', fontWeight: 'bold', fontSize: '0.85rem' }}>DEFESA ANTI-CRINGE</p>
+              <span style={{ fontSize: '2rem', color: '#ffffff', fontWeight: '900' }}>{meusAtributos.defesa.nota}</span>
+              <div className="barra-atributo-bg">
+                <div className="barra-atributo-fill" style={{ width: `${meusAtributos.defesa.pct}%`, backgroundColor: minhaClasse.cor }}></div>
+              </div>
+            </div>
+          </div>
+
+          {/* FOOTER DO CARTÃO */}
+          <div className="cartao-rodapé-tech" style={{ position: 'relative', zIndex: 1 }}>
+            <span>HASH: {hashAutenticidade}</span>
+            <span>VERIFIED BY AURA_CORE v1.0</span>
           </div>
         </div>
 
+        {/* CONQUISTAS */}
         <h2 style={{ color: '#c7d2fe', borderBottom: '3px solid #312e81', paddingBottom: '10px' }}>Conquistas Desbloqueadas</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginTop: '20px' }}>
           <div style={{ backgroundColor: '#111827', border: '3px solid #000', padding: '15px', borderRadius: '8px', textAlign: 'center' }}>
@@ -305,13 +384,11 @@ function App() {
             <h4 style={{ margin: '0 0 5px 0', color: '#e2e8f0' }}>Acesso Concedido</h4>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#9ca3af' }}>Criou uma conta no sistema.</p>
           </div>
-
           <div style={{ backgroundColor: '#111827', border: '3px solid #000', padding: '15px', borderRadius: '8px', textAlign: 'center', opacity: jaRespondeu ? 1 : 0.4 }}>
             <div style={{ fontSize: '2rem', marginBottom: '10px' }}>⚡</div>
             <h4 style={{ margin: '0 0 5px 0', color: '#e2e8f0' }}>Primeira Auditoria</h4>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#9ca3af' }}>Calculou a aura pela primeira vez.</p>
           </div>
-
           <div style={{ backgroundColor: '#111827', border: '3px solid #000', padding: '15px', borderRadius: '8px', textAlign: 'center', opacity: minhaAura > 4000 ? 1 : 0.4 }}>
             <div style={{ fontSize: '2rem', marginBottom: '10px' }}>⭐</div>
             <h4 style={{ margin: '0 0 5px 0', color: '#e2e8f0' }}>Stand User</h4>
@@ -323,7 +400,7 @@ function App() {
   }
 
   // ==========================================
-  // 6. RENDERIZAÇÃO: DASHBOARD
+  // 7. RENDERIZAÇÃO: DASHBOARD PRINCIPAL
   // ==========================================
   return (
     <div className="dashboard-container">
@@ -410,35 +487,20 @@ function App() {
         </ul>
       </div>
 
-      {/* POP-UP MODAL: CALCULANDO AURA */}
+      {/* MODAL / POP-UP: CALCULANDO AURA */}
       {calculando && (
         <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'rgba(0, 0, 0, 0.85)',
-          backdropFilter: 'blur(5px)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 9999
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+          backgroundColor: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(5px)',
+          display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999
         }}>
           <div className="caixa-brutalista" style={{ maxWidth: '500px', width: '90%', textAlign: 'center', animation: 'none' }}>
             <h2 style={{ color: '#0d9488', fontSize: '1.4rem', margin: '0 0 15px 0', textTransform: 'uppercase' }}>
               ⚡ [ PROCESSANDO AUDITORIA ] ⚡
             </h2>
-            
             <div style={{ backgroundColor: '#111827', border: '3px solid #000', borderRadius: '8px', height: '24px', overflow: 'hidden', marginBottom: '20px' }}>
-              <div style={{
-                width: `${loadingProgress}%`,
-                backgroundColor: '#34d399',
-                height: '100%',
-                transition: 'width 0.3s ease'
-              }}></div>
+              <div style={{ width: `${loadingProgress}%`, backgroundColor: '#34d399', height: '100%', transition: 'width 0.3s ease' }}></div>
             </div>
-
             <p style={{ color: '#c7d2fe', fontSize: '1rem', fontWeight: 'bold', minHeight: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {FRASES_LOADING[loadingTextoIndex]}
             </p>
