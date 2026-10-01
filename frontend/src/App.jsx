@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import './App.css';
 
+const API_URL = 'https://aura-system-4t1h.onrender.com';
+
 // ==========================================
 // CONSTANTES GLOBAIS
 // ==========================================
@@ -44,10 +46,10 @@ function App() {
   // ==========================================
   const carregarDadosBase = async () => {
     try {
-      const resRanking = await fetch('http://localhost:3000/ranking');
+      const resRanking = await fetch(`${API_URL}/ranking`);
       setRanking(await resRanking.json());
 
-      const resQuestoes = await fetch('http://localhost:3000/questionario');
+      const resQuestoes = await fetch(`${API_URL}/questionario`);
       setQuestionario(await resQuestoes.json());
     } catch (error) {
       setMensagem("Erro de conexão. O servidor backend está ligado?");
@@ -67,7 +69,7 @@ function App() {
     const usuarioFormatado = inputUsuario.trim();
     
     try {
-      const resposta = await fetch(`http://localhost:3000${rota}`, {
+      const resposta = await fetch(`${API_URL}${rota}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usuario: usuarioFormatado, senha: inputSenha })
@@ -128,7 +130,7 @@ function App() {
       const totalPontos = Object.values(respostas).reduce((acc, pontos) => acc + Number(pontos), 0);
       
       try {
-        const resposta = await fetch('http://localhost:3000/calcular-semana', {
+        const resposta = await fetch(`${API_URL}/calcular-semana`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ usuario: usuarioLogado, totalPontos })
