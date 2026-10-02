@@ -4,7 +4,6 @@ import './App.css';
 
 // ==========================================
 // CONFIGURAÇÃO AUTOMÁTICA DE AMBIENTE
-// O sistema deteta sozinho se está a correr no localhost ou na Vercel
 // ==========================================
 const API_URL = window.location.hostname === 'localhost' 
   ? 'http://localhost:3000' 
@@ -21,6 +20,18 @@ const FRASES_LOADING = [
   "Analisando se você assistiu ao vídeo de 3 minutos...",
   "Sincronizando com os servidores centrais da Aura...",
   "Verificando histórico de figurinhas do WhatsApp..."
+];
+
+const LOGS_SISTEMA = [
+  "[LOG] Operador Desconhecido perdeu Aura e foi moggado.",
+  "[SEC] Alerta de atividade Cringe no Setor 4...",
+  "[SYS] Sincronizando com o banco central da Aura.",
+  "[ALERT] Houve um Stand User não identificado na rede.",
+  "[LOG] Um usuário foi desconectado por taxa de reprovação.",
+  "[SYS] Recalibrando sensores de QI de Internet...",
+  "[NET] Tráfego anômalo de Aura detectado no servidor de memes.",
+  "[SEC] Firewall bloqueou tentativa de Mewing falso.",
+  "[LOG] Auditoria de emergência iniciada no Terminal 2."
 ];
 
 function App() {
@@ -47,6 +58,34 @@ function App() {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingTextoIndex, setLoadingTextoIndex] = useState(0);
 
+  // Controle do Questionário Passo-a-Passo
+  const [perguntaAtual, setPerguntaAtual] = useState(0);
+  const [animandoTransicao, setAnimandoTransicao] = useState(false);
+
+  //Logs do Sistema
+  const [notificacoes, setNotificacoes] = useState([]);
+  // === MOTOR DE NOTIFICAÇÕES FANTASMA ===
+  useEffect(() => {
+    // Tenta lançar um log a cada 6 segundos
+    const intervalo = setInterval(() => {
+      // 60% de chance de realmente aparecer uma notificação para não ficar muito poluído
+      if (Math.random() > 0.4) {
+        const novoLog = LOGS_SISTEMA[Math.floor(Math.random() * LOGS_SISTEMA.length)];
+        const id = Date.now(); // Cria um ID único
+        
+        // Adiciona a notificação no ecrã
+        setNotificacoes(prev => [...prev, { id, texto: novoLog }]);
+
+        // Apaga a notificação automaticamente após 4.5 segundos
+        setTimeout(() => {
+          setNotificacoes(prev => prev.filter(n => n.id !== id));
+        }, 4500);
+      }
+    }, 6000);
+
+    return () => clearInterval(intervalo);
+  }, []);
+
   // ==========================================
   // 2. COMUNICAÇÃO COM O BACKEND
   // ==========================================
@@ -71,7 +110,6 @@ function App() {
     e.preventDefault(); 
     const rota = isRegistro ? '/registro' : '/login';
     
-    // Tratamento básico para evitar espaços em branco
     const usuarioFormatado = inputUsuario.trim();
     
     try {
@@ -108,6 +146,24 @@ function App() {
   // ==========================================
   const selecionarOpcao = (idPergunta, pontos) => {
     setRespostas({ ...respostas, [idPergunta]: pontos });
+
+    if (perguntaAtual < questionario.length - 1) {
+      setAnimandoTransicao(true); 
+      setTimeout(() => {
+        setPerguntaAtual((prev) => prev + 1); 
+        setAnimandoTransicao(false); 
+      }, 400); 
+    }
+  };
+
+  const voltarPergunta = () => {
+    if (perguntaAtual > 0) {
+      setAnimandoTransicao(true);
+      setTimeout(() => {
+        setPerguntaAtual((prev) => prev - 1);
+        setAnimandoTransicao(false);
+      }, 300);
+    }
   };
 
   const enviarQuestionario = async () => {
@@ -117,7 +173,6 @@ function App() {
       return;
     }
     
-    // Trava de segurança: Inicia animação
     setCalculando(true);
     setLoadingProgress(0);
 
@@ -168,7 +223,7 @@ function App() {
     try {
       const canvas = await html2canvas(elemento, { 
         backgroundColor: '#111827', 
-        scale: 2 // Alta resolução
+        scale: 2 
       });
       
       const imagem = canvas.toDataURL('image/png');
@@ -266,16 +321,15 @@ function App() {
       </>
     );
   }
-// ==========================================
-  // 6. TELA DE PERFIL (COM CARTÃO, CONQUISTAS E TERMINAL)
+
+  // ==========================================
+  // 6. TELA DE PERFIL (COM CARTÃO E CONQUISTAS)
   // ==========================================
   if (telaAtual === 'perfil') {
     const hashAutenticidade = `AURA-SYS-${btoa(usuarioLogado || 'GUEST').substring(0, 8).toUpperCase()}-2026`;
 
     return (
       <div className="caixa-brutalista" style={{ maxWidth: '800px', margin: '3rem auto', width: '90%' }}>
-        
-        {/* CABEÇALHO DO PERFIL (Agora quebra a linha no mobile com flexWrap) */}
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '15px' }}>
           <h1 className="titulo-brutal" style={{ margin: 0, border: 'none', padding: 0 }}>ID do Operador</h1>
           <div style={{ display: 'flex', gap: '10px', flexGrow: 1, justifyContent: 'flex-end' }}>
@@ -284,13 +338,8 @@ function App() {
           </div>
         </div>
 
-        {/* ================= WRAPPER DE SCROLL MOBILE ================= */}
-        {/* Isto protege o cartão. No PC não faz nada, no Mobile permite deslizar! */}
         <div style={{ width: '100%', overflowX: 'auto', paddingBottom: '15px', marginBottom: '15px' }}>
-          
-          {/* ================= CARTÃO DE AURA ================= */}
           <div id="cartao-aura" style={{ border: `3px solid ${minhaClasse.cor}`, padding: '30px', borderRadius: '12px', boxShadow: `6px 6px 0px ${minhaClasse.cor}`, backgroundColor: '#111827', minWidth: '550px' }}>
-            
             <div className="selo-carimbo-container">
               <div className="selo-carimbo" style={{ color: minhaClasse.cor }}>
                 <div className="selo-topo">AURA-SYS // DEPT</div>
@@ -336,43 +385,34 @@ function App() {
             </div>
           </div>
         </div>
-        {/* ================= FIM DO WRAPPER DE SCROLL ================= */}
 
-        {/* ================= ARQUIVOS DE CONQUISTA ================= */}
         <h2 style={{ color: '#c7d2fe', borderBottom: '3px solid #312e81', paddingBottom: '10px', marginTop: '40px' }}>Arquivos de Conquista</h2>
-        
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginTop: '20px' }}>
-          
           <div style={{ backgroundColor: '#111827', border: '3px solid #000', padding: '15px', borderRadius: '8px', textAlign: 'center' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>🌐</div>
             <h4 style={{ margin: '0 0 5px 0', color: '#e2e8f0' }}>Acesso Concedido</h4>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#9ca3af' }}>Entrou no sistema pela primeira vez.</p>
           </div>
-
           <div style={{ backgroundColor: '#111827', border: '3px solid #000', padding: '15px', borderRadius: '8px', textAlign: 'center', opacity: jaRespondeu ? 1 : 0.4 }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '10px', filter: jaRespondeu ? 'none' : 'grayscale(1)' }}>⚡</div>
             <h4 style={{ margin: '0 0 5px 0', color: '#e2e8f0' }}>Primeira Auditoria</h4>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#9ca3af' }}>Calculou a aura com sucesso.</p>
           </div>
-
           <div style={{ backgroundColor: '#111827', border: '3px solid #000', padding: '15px', borderRadius: '8px', textAlign: 'center', opacity: minhaAura >= 4000 ? 1 : 0.4 }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '10px', filter: minhaAura >= 4000 ? 'none' : 'grayscale(1)' }}>⭐</div>
             <h4 style={{ margin: '0 0 5px 0', color: '#e2e8f0' }}>Stand User</h4>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#9ca3af' }}>Ultrapassou os 4.000 pontos de Aura.</p>
           </div>
-
           <div style={{ backgroundColor: '#111827', border: '3px solid #000', padding: '15px', borderRadius: '8px', textAlign: 'center', opacity: minhaAura < 0 ? 1 : 0.4 }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '10px', filter: minhaAura < 0 ? 'none' : 'grayscale(1)' }}>☣️</div>
             <h4 style={{ margin: '0 0 5px 0', color: '#f87171' }}>Ameaça Radioativa</h4>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#9ca3af' }}>Atingiu Aura Negativa (Hater/NPC).</p>
           </div>
-
           <div style={{ backgroundColor: '#111827', border: '3px solid #000', padding: '15px', borderRadius: '8px', textAlign: 'center', opacity: minhaAura >= 10000 ? 1 : 0.4 }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '10px', filter: minhaAura >= 10000 ? 'none' : 'grayscale(1)' }}>👑</div>
             <h4 style={{ margin: '0 0 5px 0', color: '#fbbf24' }}>Divindade da Net</h4>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#9ca3af' }}>Ultrapassou a marca de 10.000 pontos!</p>
           </div>
-
           <div style={{ backgroundColor: '#111827', border: '3px solid #000', padding: '15px', borderRadius: '8px', textAlign: 'center', opacity: (minhaAura === 0 && jaRespondeu) ? 1 : 0.4 }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '10px', filter: (minhaAura === 0 && jaRespondeu) ? 'none' : 'grayscale(1)' }}>⚖️</div>
             <h4 style={{ margin: '0 0 5px 0', color: '#e2e8f0' }}>True Neutral</h4>
@@ -380,7 +420,6 @@ function App() {
           </div>
         </div>
 
-        {/* ================= TERMINAL DE LOGS ================= */}
         <div style={{ backgroundColor: '#000', border: '3px solid #312e81', padding: '20px', borderRadius: '8px', marginTop: '40px', fontFamily: 'monospace', color: '#34d399', boxShadow: '4px 4px 0px #000' }}>
           <p style={{ margin: 0, color: '#6b7280', borderBottom: '1px solid #312e81', paddingBottom: '10px' }}>
             root@aura-sys:~# tail -f /var/log/operator_status.log
@@ -395,13 +434,12 @@ function App() {
             <p className="piscar-cursor" style={{ margin: '5px 0 0 0', fontSize: '1.2rem', color: '#fff' }}>_</p>
           </div>
         </div>
-
       </div>
     );
   }
 
   // ==========================================
-  // 7. TELA DASHBOARD PRINCIPAL (QUESTIONÁRIO)
+  // 7. TELA DASHBOARD PRINCIPAL (QUESTIONÁRIO PASSO A PASSO)
   // ==========================================
   return (
     <div className="dashboard-container">
@@ -413,7 +451,7 @@ function App() {
           <h3 style={{ margin: 0 }}>Operador: <span style={{color: '#c7d2fe'}}>{usuarioLogado}</span></h3>
           <div style={{ display: 'flex', gap: '10px' }}>
             <button className="btn-epico" style={{ width: 'auto', padding: '10px 15px', fontSize: '0.9rem' }} onClick={() => setTelaAtual('perfil')}>Ver Perfil</button>
-            <button className="btn-negativo" style={{ padding: '10px 15px', fontSize: '0.9rem' }} onClick={() => { setUsuarioLogado(null); setRespostas({}); setMensagem(''); setInputSenha(''); setTelaAtual('dashboard'); }}>Sair</button>
+            <button className="btn-negativo" style={{ padding: '10px 15px', fontSize: '0.9rem' }} onClick={() => { setUsuarioLogado(null); setRespostas({}); setMensagem(''); setInputSenha(''); setTelaAtual('dashboard'); setPerguntaAtual(0); }}>Sair</button>
           </div>
         </div>
 
@@ -427,6 +465,7 @@ function App() {
         ) : (
           <div style={{ textAlign: 'left', marginBottom: '10px' }}>
             
+            {/* PROGRESSO DA AUDITORIA */}
             <div style={{ marginBottom: '30px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ fontWeight: 'bold', color: '#9ca3af' }}>Progresso dos Dados</span>
@@ -437,23 +476,55 @@ function App() {
               </div>
             </div>
 
-            {questionario.map((q, index) => (
-              <div key={q.id} style={{ marginBottom: '35px' }}>
-                <h4 style={{ margin: '0 0 15px 0', fontSize: '1.2rem', fontWeight: '900' }}>{index + 1}. {q.pergunta}</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                  {q.opcoes.map((opcao, i) => (
-                    <label key={i} className={respostas[q.id] === opcao.pontos ? 'opcao-selecionada' : 'opcao-normal'}>
-                      <input type="radio" name={`pergunta-${q.id}`} value={opcao.pontos} style={{ display: 'none' }} onChange={() => selecionarOpcao(q.id, opcao.pontos)} />
+            {/* INTERROGATÓRIO PASSO-A-PASSO */}
+            {questionario.length > 0 && (
+              <div className={`pergunta-container ${animandoTransicao ? 'escondido' : 'visivel'}`}>
+                
+                <h4 style={{ margin: '0 0 10px 0', fontSize: '1rem', fontWeight: '900', color: '#6b7280', letterSpacing: '2px' }}>
+                  [ PROTOCOLO {perguntaAtual + 1} / {questionario.length} ]
+                </h4>
+                
+                <h2 style={{ margin: '0 0 25px 0', fontSize: '1.4rem', color: '#ffffff', minHeight: '60px' }}>
+                  {questionario[perguntaAtual].pergunta}
+                </h2>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {questionario[perguntaAtual].opcoes.map((opcao, i) => (
+                    <label 
+                      key={i} 
+                      className={respostas[questionario[perguntaAtual].id] === opcao.pontos ? 'opcao-selecionada' : 'opcao-normal'}
+                    >
+                      <input 
+                        type="radio" 
+                        name={`pergunta-${questionario[perguntaAtual].id}`} 
+                        value={opcao.pontos} 
+                        style={{ display: 'none' }} 
+                        onChange={() => selecionarOpcao(questionario[perguntaAtual].id, opcao.pontos)} 
+                      />
                       {opcao.texto}
                     </label>
                   ))}
                 </div>
+
+                {/* BOTÕES DE NAVEGAÇÃO */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '30px' }}>
+                  <button 
+                    className="btn-negativo" 
+                    style={{ opacity: perguntaAtual === 0 ? 0 : 1, pointerEvents: perguntaAtual === 0 ? 'none' : 'auto' }}
+                    onClick={voltarPergunta}
+                  >
+                    « Anterior
+                  </button>
+
+                  {/* Mostra botão de calcular SOMENTE na última pergunta se todas estiverem respondidas */}
+                  {perguntaAtual === questionario.length - 1 && Object.keys(respostas).length === questionario.length && (
+                    <button className="btn-epico" style={{ width: 'auto' }} onClick={enviarQuestionario} disabled={calculando}>
+                      {calculando ? 'Processando...' : 'Calcular Aura!'}
+                    </button>
+                  )}
+                </div>
               </div>
-            ))}
-            
-            <button className="btn-epico" onClick={enviarQuestionario} disabled={calculando}>
-              {calculando ? 'Processando...' : 'Calcular Aura!'}
-            </button>
+            )}
           </div>
         )}
         
@@ -494,6 +565,14 @@ function App() {
           </div>
         </div>
       )}
+      {/* ================= SISTEMA DE NOTIFICAÇÕES FANTASMA ================= */}
+      <div className="container-notificacoes">
+        {notificacoes.map(notif => (
+          <div key={notif.id} className="notificacao-fantasma">
+            <span className="notif-cursor">{'> '}</span> {notif.texto}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

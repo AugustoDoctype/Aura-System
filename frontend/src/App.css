@@ -442,3 +442,78 @@ body {
     min-height: auto !important;
   }
 }
+
+/* ==========================================
+   TRANSIÇÕES DO QUESTIONÁRIO PASSO-A-PASSO
+   ========================================== */
+.pergunta-container {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  min-height: 400px; /* Garante que o painel não fique encolhendo e crescendo */
+}
+
+.visivel {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.escondido {
+  opacity: 0;
+  transform: translateX(-20px); /* Dá um efeito de escorregar para a esquerda ao sumir */
+}
+
+/* ==========================================
+   NOTIFICAÇÕES FANTASMA DO SISTEMA
+   ========================================== */
+.container-notificacoes {
+  position: fixed;
+  bottom: 30px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 100;
+  pointer-events: none; /* Garante que os pop-ups não bloqueiam cliques no site */
+}
+
+.notificacao-fantasma {
+  background-color: rgba(0, 0, 0, 0.85);
+  border-left: 3px solid #34d399; /* Linha verde néon */
+  color: #34d399;
+  font-family: monospace;
+  font-size: 0.85rem;
+  padding: 10px 15px;
+  border-radius: 4px;
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(4px);
+  /* Animação de entrada (desliza da esquerda) */
+  animation: fadeLogEntrada 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.notif-cursor {
+  color: #ffffff;
+  font-weight: 900;
+  margin-right: 5px;
+}
+
+@keyframes fadeLogEntrada {
+  from { 
+    opacity: 0; 
+    transform: translateX(-40px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0); 
+  }
+}
+
+/* Responsividade para não cobrir tudo no telemóvel */
+@media (max-width: 900px) {
+  .container-notificacoes {
+    bottom: 15px;
+    left: 15px;
+    right: 15px;
+  }
+  .notificacao-fantasma {
+    font-size: 0.75rem;
+  }
+}
