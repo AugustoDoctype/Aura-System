@@ -41,15 +41,30 @@ body {
 
 .login-container {
   max-width: 450px;
-  width: 90%; /* Garante que não quebra no celular */
+  width: 90%; 
   
-  /* Cravando a caixa exatamente no centro da tela */
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   
+  /* O transform fica estático, responsável APENAS por manter no centro */
+  transform: translate(-50%, -50%);
   text-align: center;
+  
+  /* O !important garante que a animação original da caixa-brutalista seja ignorada */
+  animation: fadeLogin 0.4s ease-out forwards !important;
+}
+
+/* Nova animação que NÃO usa transform */
+@keyframes fadeLogin {
+  from { 
+    opacity: 0; 
+    margin-top: 30px; /* Empurra a caixa para baixo usando margem */
+  }
+  to { 
+    opacity: 1; 
+    margin-top: 0; /* Volta à posição original perfeitamente centralizada */
+  }
 }
 
 /* ==========================================
@@ -346,4 +361,84 @@ body {
 @keyframes piscar {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
+}
+
+/* ==========================================
+   ANIMAÇÕES E RESPONSIVIDADE (MOBILE)
+   ========================================== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Regras para ecrãs menores (Telemóveis e Tablets) */
+@media (max-width: 900px) {
+  .dashboard-container {
+    grid-template-columns: 1fr;
+    margin: 1.5rem auto;
+  }
+
+  /* Reduz a caixa e as sombras gigantes */
+  .caixa-brutalista {
+    padding: 15px;
+    border-width: 3px;
+    box-shadow: 4px 4px 0px #000;
+  }
+
+  /* Títulos proporcionais */
+  .titulo-brutal {
+    font-size: 1.5rem;
+    padding-bottom: 10px;
+    border-bottom-width: 3px;
+  }
+
+  /* Empilha o painel de operador (Nome e Botões de Sair/Perfil) */
+  .painel-usuario {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .painel-usuario div {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .painel-usuario button {
+    flex: 1;
+    padding: 10px;
+  }
+
+  /* Ajustes dos textos do questionário */
+  .opcao-normal, .opcao-selecionada {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+
+  /* Ajustes dos botões e inputs da tela de Login */
+  .input-nome, .btn-epico {
+    padding: 12px;
+    font-size: 1rem;
+  }
+  
+  /* Ranking lateral menor */
+  .ranking-item {
+    font-size: 0.9rem;
+  }
+
+  /* Reduz os emojis das conquistas para poupar espaço vertical */
+  .caixa-brutalista > div[style*="display: grid"] > div > div:first-child {
+    font-size: 1.8rem !important;
+    margin-bottom: 5px !important;
+  }
+
+  /* Ajustes para o Pop-up de Carregamento não estourar a tela */
+  .caixa-brutalista h2[style*="color: #0d9488"] {
+    font-size: 1.1rem !important;
+  }
+  .caixa-brutalista p[style*="minHeight"] {
+    font-size: 0.85rem !important;
+    min-height: auto !important;
+  }
 }

@@ -266,8 +266,7 @@ function App() {
       </>
     );
   }
-
-  // ==========================================
+// ==========================================
   // 6. TELA DE PERFIL (COM CARTÃO, CONQUISTAS E TERMINAL)
   // ==========================================
   if (telaAtual === 'perfil') {
@@ -276,62 +275,68 @@ function App() {
     return (
       <div className="caixa-brutalista" style={{ maxWidth: '800px', margin: '3rem auto', width: '90%' }}>
         
-        {/* CABEÇALHO DO PERFIL */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        {/* CABEÇALHO DO PERFIL (Agora quebra a linha no mobile com flexWrap) */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '15px' }}>
           <h1 className="titulo-brutal" style={{ margin: 0, border: 'none', padding: 0 }}>ID do Operador</h1>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button className="btn-epico" style={{ width: 'auto', padding: '10px 15px', fontSize: '0.9rem' }} onClick={exportarCartao}>Exportar Cartão</button>
-            <button className="btn-negativo" style={{ padding: '10px 15px', fontSize: '0.9rem' }} onClick={() => setTelaAtual('dashboard')}>Voltar ao Painel</button>
+          <div style={{ display: 'flex', gap: '10px', flexGrow: 1, justifyContent: 'flex-end' }}>
+            <button className="btn-epico" style={{ width: 'auto', padding: '10px 15px', fontSize: '0.9rem', flex: 1 }} onClick={exportarCartao}>Exportar</button>
+            <button className="btn-negativo" style={{ padding: '10px 15px', fontSize: '0.9rem', flex: 1 }} onClick={() => setTelaAtual('dashboard')}>Voltar</button>
           </div>
         </div>
 
-        {/* ================= CARTÃO DE AURA ================= */}
-        <div id="cartao-aura" style={{ border: `3px solid ${minhaClasse.cor}`, padding: '30px', borderRadius: '12px', boxShadow: `6px 6px 0px ${minhaClasse.cor}`, marginBottom: '30px', backgroundColor: '#111827' }}>
+        {/* ================= WRAPPER DE SCROLL MOBILE ================= */}
+        {/* Isto protege o cartão. No PC não faz nada, no Mobile permite deslizar! */}
+        <div style={{ width: '100%', overflowX: 'auto', paddingBottom: '15px', marginBottom: '15px' }}>
           
-          <div className="selo-carimbo-container">
-            <div className="selo-carimbo" style={{ color: minhaClasse.cor }}>
-              <div className="selo-topo">AURA-SYS // DEPT</div>
-              <div className="selo-principal">{minhaAura >= 0 ? '✓ AUDITADO' : '✗ REJEITADO'}</div>
-              <div className="selo-rodape">{minhaAura >= 0 ? 'STATUS: APROVADO' : 'STATUS: LOW AURA'}</div>
+          {/* ================= CARTÃO DE AURA ================= */}
+          <div id="cartao-aura" style={{ border: `3px solid ${minhaClasse.cor}`, padding: '30px', borderRadius: '12px', boxShadow: `6px 6px 0px ${minhaClasse.cor}`, backgroundColor: '#111827', minWidth: '550px' }}>
+            
+            <div className="selo-carimbo-container">
+              <div className="selo-carimbo" style={{ color: minhaClasse.cor }}>
+                <div className="selo-topo">AURA-SYS // DEPT</div>
+                <div className="selo-principal">{minhaAura >= 0 ? '✓ AUDITADO' : '✗ REJEITADO'}</div>
+                <div className="selo-rodape">{minhaAura >= 0 ? 'STATUS: APROVADO' : 'STATUS: LOW AURA'}</div>
+              </div>
             </div>
-          </div>
-          
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px dashed #312e81', paddingBottom: '20px', marginBottom: '25px', position: 'relative', zIndex: 1 }}>
-            <div style={{ flex: 1, paddingRight: '20px' }}>
-              <p style={{ margin: 0, color: '#6b7280', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase' }}>OPERADOR_ID</p>
-              <h2 style={{ fontSize: '2.2rem', margin: '0 0 10px 0', color: '#ffffff', wordBreak: 'break-word' }}>{usuarioLogado}</h2>
-              <p style={{ margin: 0, color: '#9ca3af', fontSize: '0.9rem', fontWeight: 'bold' }}>CLASSE REGISTRADA:</p>
-              <h3 style={{ margin: 0, color: minhaClasse.cor, fontSize: '1.4rem', textTransform: 'uppercase' }}>{minhaClasse.titulo}</h3>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px dashed #312e81', paddingBottom: '20px', marginBottom: '25px', position: 'relative', zIndex: 1 }}>
+              <div style={{ flex: 1, paddingRight: '20px' }}>
+                <p style={{ margin: 0, color: '#6b7280', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase' }}>OPERADOR_ID</p>
+                <h2 style={{ fontSize: '2.2rem', margin: '0 0 10px 0', color: '#ffffff', wordBreak: 'break-word' }}>{usuarioLogado}</h2>
+                <p style={{ margin: 0, color: '#9ca3af', fontSize: '0.9rem', fontWeight: 'bold' }}>CLASSE REGISTRADA:</p>
+                <h3 style={{ margin: 0, color: minhaClasse.cor, fontSize: '1.4rem', textTransform: 'uppercase' }}>{minhaClasse.titulo}</h3>
+              </div>
+              <div style={{ textAlign: 'right', paddingRight: '190px' }}>
+                <p style={{ margin: 0, color: '#9ca3af', fontSize: '0.9rem', fontWeight: 'bold' }}>AURA TOTAL:</p>
+                <h1 style={{ margin: 0, fontSize: '3.8rem', color: minhaClasse.cor, lineHeight: '1' }}>{jaRespondeu ? minhaAura : '???'}</h1>
+              </div>
             </div>
-            <div style={{ textAlign: 'right', paddingRight: '190px' }}>
-              <p style={{ margin: 0, color: '#9ca3af', fontSize: '0.9rem', fontWeight: 'bold' }}>AURA TOTAL:</p>
-              <h1 style={{ margin: 0, fontSize: '3.8rem', color: minhaClasse.cor, lineHeight: '1' }}>{jaRespondeu ? minhaAura : '???'}</h1>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '25px', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+              <div>
+                <p style={{ margin: '0 0 4px 0', color: '#9ca3af', fontWeight: 'bold', fontSize: '0.85rem' }}>QI DE INTERNET</p>
+                <span style={{ fontSize: '2rem', color: '#ffffff', fontWeight: '900' }}>{meusAtributos.internet.nota}</span>
+                <div className="barra-atributo-bg"><div className="barra-atributo-fill" style={{ width: `${meusAtributos.internet.pct}%`, backgroundColor: minhaClasse.cor }}></div></div>
+              </div>
+              <div>
+                <p style={{ margin: '0 0 4px 0', color: '#9ca3af', fontWeight: 'bold', fontSize: '0.85rem' }}>RESILIÊNCIA DE TI</p>
+                <span style={{ fontSize: '2rem', color: '#ffffff', fontWeight: '900' }}>{meusAtributos.suporte.nota}</span>
+                <div className="barra-atributo-bg"><div className="barra-atributo-fill" style={{ width: `${meusAtributos.suporte.pct}%`, backgroundColor: minhaClasse.cor }}></div></div>
+              </div>
+              <div>
+                <p style={{ margin: '0 0 4px 0', color: '#9ca3af', fontWeight: 'bold', fontSize: '0.85rem' }}>DEFESA ANTI-CRINGE</p>
+                <span style={{ fontSize: '2rem', color: '#ffffff', fontWeight: '900' }}>{meusAtributos.defesa.nota}</span>
+                <div className="barra-atributo-bg"><div className="barra-atributo-fill" style={{ width: `${meusAtributos.defesa.pct}%`, backgroundColor: minhaClasse.cor }}></div></div>
+              </div>
             </div>
-          </div>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '25px', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-            <div>
-              <p style={{ margin: '0 0 4px 0', color: '#9ca3af', fontWeight: 'bold', fontSize: '0.85rem' }}>QI DE INTERNET</p>
-              <span style={{ fontSize: '2rem', color: '#ffffff', fontWeight: '900' }}>{meusAtributos.internet.nota}</span>
-              <div className="barra-atributo-bg"><div className="barra-atributo-fill" style={{ width: `${meusAtributos.internet.pct}%`, backgroundColor: minhaClasse.cor }}></div></div>
+            
+            <div className="cartao-rodapé-tech" style={{ position: 'relative', zIndex: 1 }}>
+              <span>HASH: {hashAutenticidade}</span>
+              <span>VERIFIED BY AURA_CORE v1.0</span>
             </div>
-            <div>
-              <p style={{ margin: '0 0 4px 0', color: '#9ca3af', fontWeight: 'bold', fontSize: '0.85rem' }}>RESILIÊNCIA DE TI</p>
-              <span style={{ fontSize: '2rem', color: '#ffffff', fontWeight: '900' }}>{meusAtributos.suporte.nota}</span>
-              <div className="barra-atributo-bg"><div className="barra-atributo-fill" style={{ width: `${meusAtributos.suporte.pct}%`, backgroundColor: minhaClasse.cor }}></div></div>
-            </div>
-            <div>
-              <p style={{ margin: '0 0 4px 0', color: '#9ca3af', fontWeight: 'bold', fontSize: '0.85rem' }}>DEFESA ANTI-CRINGE</p>
-              <span style={{ fontSize: '2rem', color: '#ffffff', fontWeight: '900' }}>{meusAtributos.defesa.nota}</span>
-              <div className="barra-atributo-bg"><div className="barra-atributo-fill" style={{ width: `${meusAtributos.defesa.pct}%`, backgroundColor: minhaClasse.cor }}></div></div>
-            </div>
-          </div>
-          
-          <div className="cartao-rodapé-tech" style={{ position: 'relative', zIndex: 1 }}>
-            <span>HASH: {hashAutenticidade}</span>
-            <span>VERIFIED BY AURA_CORE v1.0</span>
           </div>
         </div>
+        {/* ================= FIM DO WRAPPER DE SCROLL ================= */}
 
         {/* ================= ARQUIVOS DE CONQUISTA ================= */}
         <h2 style={{ color: '#c7d2fe', borderBottom: '3px solid #312e81', paddingBottom: '10px', marginTop: '40px' }}>Arquivos de Conquista</h2>
