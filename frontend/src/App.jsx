@@ -61,9 +61,39 @@ function App() {
   // Controle do Questionário Passo-a-Passo
   const [perguntaAtual, setPerguntaAtual] = useState(0);
   const [animandoTransicao, setAnimandoTransicao] = useState(false);
+  // === NOVO: Texto animado da máquina de escrever ===
+  const [textoDigitado, setTextoDigitado] = useState('');
 
   //Logs do Sistema
   const [notificacoes, setNotificacoes] = useState([]);
+
+  // === MOTOR DA MÁQUINA DE ESCREVER ===
+  useEffect(() => {
+    if (questionario.length === 0) return; // Se não tiver perguntas, não faz nada
+    
+    const textoCompleto = questionario[perguntaAtual].pergunta;
+    setTextoDigitado(''); // Limpa o texto da pergunta anterior
+    let letraIndex = 0;
+    
+    // Espera a animação de deslizar terminar (300ms) para começar a digitar
+    const delayAnimacao = setTimeout(() => {
+      const timerDeDigitacao = setInterval(() => {
+        if (letraIndex < textoCompleto.length) {
+          // Adiciona a próxima letra
+          setTextoDigitado(textoCompleto.slice(0, letraIndex + 1));
+          letraIndex++;
+        } else {
+          // Quando terminar de digitar tudo, para o relógio
+          clearInterval(timerDeDigitacao);
+        }
+      }, 30); // <-- Velocidade de digitação (30ms). Diminua para mais rápido, aumente para mais lento.
+      
+      // Limpeza do intervalo se o utilizador clicar rápido demais
+      return () => clearInterval(timerDeDigitacao);
+    }, 300);
+
+    return () => clearTimeout(delayAnimacao);
+  }, [perguntaAtual, questionario]);
   // === MOTOR DE NOTIFICAÇÕES FANTASMA ===
   useEffect(() => {
     // Tenta lançar um log a cada 6 segundos
@@ -484,8 +514,10 @@ function App() {
                   [ PROTOCOLO {perguntaAtual + 1} / {questionario.length} ]
                 </h4>
                 
-                <h2 style={{ margin: '0 0 25px 0', fontSize: '1.4rem', color: '#ffffff', minHeight: '60px' }}>
-                  {questionario[perguntaAtual].pergunta}
+                <h2 style={{ margin: '0 0 25px 0', fontSize: '1.4rem', color: '#ffffff', minHeight: '80px' }}>
+                {/* Renderiza o texto que está a ser digitado e adiciona o cursor hacker no final */}
+                {textoDigitado}
+                <span className="piscar-cursor" style={{ color: '#34d399' }}>_</span>
                 </h2>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
