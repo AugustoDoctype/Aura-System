@@ -521,22 +521,16 @@ function App() {
                 </h2>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {questionario[perguntaAtual].opcoes.map((opcao, i) => (
-                    <label 
-                      key={i} 
-                      className={respostas[questionario[perguntaAtual].id] === opcao.pontos ? 'opcao-selecionada' : 'opcao-normal'}
-                    >
-                      <input 
-                        type="radio" 
-                        name={`pergunta-${questionario[perguntaAtual].id}`} 
-                        value={opcao.pontos} 
-                        style={{ display: 'none' }} 
-                        onChange={() => selecionarOpcao(questionario[perguntaAtual].id, opcao.pontos)} 
-                      />
-                      {opcao.texto}
-                    </label>
-                  ))}
-                </div>
+                {questionario[perguntaAtual]?.opcoes.map((opcao, i) => (
+                <div 
+                key={i} 
+                className={respostas[questionario[perguntaAtual].id] === opcao.pontos ? 'opcao-selecionada' : 'opcao-normal'}
+                onClick={() => selecionarOpcao(questionario[perguntaAtual].id, opcao.pontos)}
+              >
+      {opcao.texto}
+    </div>
+  ))}
+</div>
 
                 {/* BOTÕES DE NAVEGAÇÃO */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '30px' }}>
@@ -550,8 +544,13 @@ function App() {
 
                   {/* Mostra botão de calcular SOMENTE na última pergunta se todas estiverem respondidas */}
                   {perguntaAtual === questionario.length - 1 && Object.keys(respostas).length === questionario.length && (
-                    <button className="btn-epico" style={{ width: 'auto' }} onClick={enviarQuestionario} disabled={calculando}>
-                      {calculando ? 'Processando...' : 'Calcular Aura!'}
+                    <button 
+                    className="btn-epico btn-glitch" 
+                    style={{ width: 'auto' }} 
+                    onClick={enviarQuestionario} 
+                    disabled={calculando}
+                    >
+                    {calculando ? 'Processando...' : 'Calcular Aura!'}
                     </button>
                   )}
                 </div>

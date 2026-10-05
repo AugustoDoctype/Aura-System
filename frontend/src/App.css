@@ -538,3 +538,49 @@ body::after {
   pointer-events: none;
   z-index: 9999;
 }
+
+/* ==========================================
+   EFEITO DE GLITCH CIBERNÉTICO (RGB SPLIT)
+   ========================================== */
+
+/* 1. Glitch ao passar o rato no botão */
+.btn-glitch:hover {
+  animation: efeitoGlitch 0.2s infinite linear alternate-reverse !important;
+  background-color: #f87171 !important; /* Fica vermelho perigo */
+  color: black !important;
+  border-color: red !important;
+}
+
+/* 2. Glitch contínuo para textos de Ameaça/Erro */
+.texto-glitch {
+  animation: efeitoGlitch 0.3s infinite linear alternate-reverse;
+  color: #f87171;
+}
+
+/* A animação que separa as cores (Vermelho e Ciano) e treme o elemento */
+@keyframes efeitoGlitch {
+  0% { 
+    text-shadow: 2px 0 0 red, -2px 0 0 cyan; 
+    transform: translate(-2px, 1px); 
+  }
+  20% { 
+    text-shadow: -2px 0 0 red, 2px 0 0 cyan; 
+    transform: translate(2px, -1px); 
+  }
+  40% { 
+    text-shadow: 2px 0 0 red, -2px 0 0 cyan; 
+    transform: translate(0, 2px); 
+  }
+  60% { 
+    text-shadow: -2px 0 0 red, 2px 0 0 cyan; 
+    transform: translate(0, -2px); 
+  }
+  80% { 
+    text-shadow: 1px 0 0 red, -1px 0 0 cyan; 
+    transform: translate(2px, 2px); 
+  }
+  100% { 
+    text-shadow: -1px 0 0 red, 1px 0 0 cyan; 
+    transform: translate(-2px, -2px); 
+  }
+}
