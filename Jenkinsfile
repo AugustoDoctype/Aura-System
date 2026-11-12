@@ -24,7 +24,7 @@ pipeline {
             steps {
                 // Entra na pasta do frontend para gerar o build do Vite
                 dir('frontend') { 
-                    sh 'npm run build'
+                    sh 'npm run inexistente'
                 }
                 echo 'Build gerado com sucesso!'
             }
